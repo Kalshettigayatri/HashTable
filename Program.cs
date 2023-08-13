@@ -60,6 +60,21 @@ class MyHashTable<K, V>
         }
         return default(V);
     }
+
+    public bool Remove(K key)
+    {
+        int index = GetBucketIndex(key);
+        if (buckets[index] != null)
+        {
+            var nodeToRemove = buckets[index].Find(node => node.Key.Equals(key));
+            if (nodeToRemove != null)
+            {
+                buckets[index].Remove(nodeToRemove);
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 class Program
@@ -69,10 +84,10 @@ class Program
         string paragraph = "Paranoids are not paranoid because they are paranoid but " +
                           "because they keep putting themselves deliberately into " +
                           "paranoid avoidable situations";
+
+        MyHashTable<string, int> wordFrequencyTable = new MyHashTable<string, int>(20);
+
         string[] words = paragraph.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-        MyHashTable<string, int> wordFrequencyTable = new MyHashTable<string, int>(words.Length);
-
         foreach (string word in words)
         {
             if (!string.IsNullOrEmpty(word))
@@ -90,7 +105,10 @@ class Program
             }
         }
 
-        // Print word frequencies
+        // Remove the word "avoidable" from the hash table
+        wordFrequencyTable.Remove("avoidable");
+
+        // Print word frequencies after removal
         foreach (string word in words)
         {
             if (!string.IsNullOrEmpty(word))
