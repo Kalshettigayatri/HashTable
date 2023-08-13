@@ -48,13 +48,30 @@ class BinarySearchTree<T> where T : IComparable<T>
         return currentNode;
     }
 
-    public void InOrderTraversal(MyBinaryNode<T> node)
+    public bool Search(T key)
     {
-        if (node != null)
+        return SearchRecursive(Root, key);
+    }
+
+    private bool SearchRecursive(MyBinaryNode<T> currentNode, T key)
+    {
+        if (currentNode == null)
         {
-            InOrderTraversal(node.Left);
-            Console.Write($"{node.Key} ");
-            InOrderTraversal(node.Right);
+            return false;
+        }
+
+        int compareResult = key.CompareTo(currentNode.Key);
+        if (compareResult == 0)
+        {
+            return true;
+        }
+        else if (compareResult < 0)
+        {
+            return SearchRecursive(currentNode.Left, key);
+        }
+        else
+        {
+            return SearchRecursive(currentNode.Right, key);
         }
     }
 }
@@ -67,8 +84,25 @@ class Program
         bst.Add(56);
         bst.Add(30);
         bst.Add(70);
+        bst.Add(22);
+        bst.Add(40);
+        bst.Add(60);
+        bst.Add(95);
+        bst.Add(11);
+        bst.Add(65);
+        bst.Add(3);
+        bst.Add(16);
+        bst.Add(63);
+        bst.Add(67);
 
-        Console.WriteLine("In-order traversal of the BST:");
-        bst.InOrderTraversal(bst.Root);
+        int searchValue = 63;
+        if (bst.Search(searchValue))
+        {
+            Console.WriteLine($"{searchValue} was found in the binary tree.");
+        }
+        else
+        {
+            Console.WriteLine($"{searchValue} was not found in the binary tree.");
+        }
     }
 }
