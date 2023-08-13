@@ -1,79 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
 
-class MyMapNode<K, V>
+class MyBinaryNode<T> where T : IComparable<T>
 {
-    public K Key { get; set; }
-    public V Value { get; set; }
-    public MyMapNode<K, V> Next { get; set; }
+    public T Key { get; set; }
+    public MyBinaryNode<T> Left { get; set; }
+    public MyBinaryNode<T> Right { get; set; }
+
+    public MyBinaryNode(T key)
+    {
+        Key = key;
+        Left = null;
+        Right = null;
+    }
 }
 
-class MyHashTable<K, V>
+class BinarySearchTree<T> where T : IComparable<T>
 {
-    private LinkedList<MyMapNode<K, V>>[] buckets;
+    public MyBinaryNode<T> Root { get; private set; }
 
-    public MyHashTable(int size)
+    public BinarySearchTree()
     {
-        buckets = new LinkedList<MyMapNode<K, V>>[size];
+        Root = null;
     }
 
-    private int GetBucketIndex(K key)
+    public void Add(T key)
     {
-        int hashCode = key.GetHashCode();
-        int index = hashCode % buckets.Length;
-        return Math.Abs(index);
+        Root = AddRecursive(Root, key);
     }
 
-    public void Add(K key, V value)
+    private MyBinaryNode<T> AddRecursive(MyBinaryNode<T> currentNode, T key)
     {
-        int index = GetBucketIndex(key);
-        if (buckets[index] == null)
+        if (currentNode == null)
         {
-            buckets[index] = new LinkedList<MyMapNode<K, V>>();
+            return new MyBinaryNode<T>(key);
         }
 
-        foreach (var node in buckets[index])
+        int compareResult = key.CompareTo(currentNode.Key);
+        if (compareResult < 0)
         {
-            if (node.Key.Equals(key))
-            {
-                node.Value = value;
-                return;
-            }
+            currentNode.Left = AddRecursive(currentNode.Left, key);
+        }
+        else if (compareResult > 0)
+        {
+            currentNode.Right = AddRecursive(currentNode.Right, key);
         }
 
-        var newNode = new MyMapNode<K, V> { Key = key, Value = value };
-        buckets[index].AddLast(newNode);
+        return currentNode;
     }
 
-    public V Get(K key)
+    public void InOrderTraversal(MyBinaryNode<T> node)
     {
-        int index = GetBucketIndex(key);
-        if (buckets[index] != null)
+        if (node != null)
         {
-            foreach (var node in buckets[index])
-            {
-                if (node.Key.Equals(key))
-                {
-                    return node.Value;
-                }
-            }
+            InOrderTraversal(node.Left);
+            Console.Write($"{node.Key} ");
+            InOrderTraversal(node.Right);
         }
-        return default(V);
-    }
-
-    public bool Remove(K key)
-    {
-        int index = GetBucketIndex(key);
-        if (buckets[index] != null)
-        {
-            var nodeToRemove = buckets[index].Find(node => node.Key.Equals(key));
-            if (nodeToRemove != null)
-            {
-                buckets[index].Remove(nodeToRemove);
-                return true;
-            }
-        }
-        return false;
     }
 }
 
@@ -81,41 +63,12 @@ class Program
 {
     static void Main(string[] args)
     {
-        string paragraph = "Paranoids are not paranoid because they are paranoid but " +
-                          "because they keep putting themselves deliberately into " +
-                          "paranoid avoidable situations";
+        BinarySearchTree<int> bst = new BinarySearchTree<int>();
+        bst.Add(56);
+        bst.Add(30);
+        bst.Add(70);
 
-        MyHashTable<string, int> wordFrequencyTable = new MyHashTable<string, int>(20);
-
-        string[] words = paragraph.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        foreach (string word in words)
-        {
-            if (!string.IsNullOrEmpty(word))
-            {
-                string normalizedWord = word.ToLower();
-                if (wordFrequencyTable.Get(normalizedWord) == default(int))
-                {
-                    wordFrequencyTable.Add(normalizedWord, 1);
-                }
-                else
-                {
-                    int currentFrequency = wordFrequencyTable.Get(normalizedWord);
-                    wordFrequencyTable.Add(normalizedWord, currentFrequency + 1);
-                }
-            }
-        }
-
-        // Remove the word "avoidable" from the hash table
-        wordFrequencyTable.Remove("avoidable");
-
-        // Print word frequencies after removal
-        foreach (string word in words)
-        {
-            if (!string.IsNullOrEmpty(word))
-            {
-                string normalizedWord = word.ToLower();
-                Console.WriteLine($"Word: {normalizedWord}, Frequency: {wordFrequencyTable.Get(normalizedWord)}");
-            }
-        }
+        Console.WriteLine("In-order traversal of the BST:");
+        bst.InOrderTraversal(bst.Root);
     }
 }
