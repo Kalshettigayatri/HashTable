@@ -66,23 +66,26 @@ class Program
 {
     static void Main(string[] args)
     {
-        string sentence = "To be or not to be";
-        string[] words = sentence.Split(' ');
+        string paragraph = "Paranoids are not paranoid because they are paranoid but " +
+                          "because they keep putting themselves deliberately into " +
+                          "paranoid avoidable situations";
+        string[] words = paragraph.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        MyHashTable<string, int> wordFrequencyTable = new MyHashTable<string, int>(10);
+        MyHashTable<string, int> wordFrequencyTable = new MyHashTable<string, int>(words.Length);
 
         foreach (string word in words)
         {
             if (!string.IsNullOrEmpty(word))
             {
-                if (wordFrequencyTable.Get(word) == default(int))
+                string normalizedWord = word.ToLower();
+                if (wordFrequencyTable.Get(normalizedWord) == default(int))
                 {
-                    wordFrequencyTable.Add(word, 1);
+                    wordFrequencyTable.Add(normalizedWord, 1);
                 }
                 else
                 {
-                    int currentFrequency = wordFrequencyTable.Get(word);
-                    wordFrequencyTable.Add(word, currentFrequency + 1);
+                    int currentFrequency = wordFrequencyTable.Get(normalizedWord);
+                    wordFrequencyTable.Add(normalizedWord, currentFrequency + 1);
                 }
             }
         }
@@ -92,7 +95,8 @@ class Program
         {
             if (!string.IsNullOrEmpty(word))
             {
-                Console.WriteLine($"Word: {word}, Frequency: {wordFrequencyTable.Get(word)}");
+                string normalizedWord = word.ToLower();
+                Console.WriteLine($"Word: {normalizedWord}, Frequency: {wordFrequencyTable.Get(normalizedWord)}");
             }
         }
     }
